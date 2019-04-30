@@ -1,6 +1,11 @@
 # Change Log
 This file contains a log of major changes in dehydrated
 
+## [x.x.x] - 2019-04-30
+## Added
+- Replaced most output with _debug and _error functions, added paramter --quiet to suppress stdout
+- Added variables ${DATEFORMAT}, ${KEYFNAME}, ${CERTFNAME} and ${FULLCFNAME}
+
 ## [x.x.x] - xxxx-xx-xx
 ## Changed
 - OCSP refresh interval is now configurable
