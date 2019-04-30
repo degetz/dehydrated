@@ -125,3 +125,15 @@
 
 # ACME API version (default: auto)
 #API=auto
+
+# Key filename (default: privkey)
+KEYFNAME=key
+
+# Cert filename (default: cert)
+#CERTFNAME=
+
+# Full chain filename (default: fullchain)
+#FULLCFNAME=
+
+# Dateformat (default: +%s) this could possibly ruin some stuff, use with caution
+DATEFORMAT=+%Y%m%d-%H%M-%S%4N
