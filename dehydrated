@@ -1658,7 +1658,7 @@ main() {
         ;;
 
       # PARAM_Usage: --quiet (-q)
-      # PARAM_Description: Suppresses standard output when using --quiet
+      # PARAM_Description: Suppresses standard output when using --quiet, useful with --signcsr
       --quiet|-q)
         PARAM_SILENT=1
         ;;
