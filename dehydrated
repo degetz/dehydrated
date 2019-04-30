@@ -45,7 +45,6 @@ check_dependencies() {
   command -v grep > /dev/null 2>&1 || _exiterr "This script requires grep."
   command -v mktemp > /dev/null 2>&1 || _exiterr "This script requires mktemp."
   command -v diff > /dev/null 2>&1 || _exiterr "This script requires diff."
-  command -v find > /dev/null 2>&1 || _exiterr "This script requires find."
 
   # curl returns with an error code in some ancient versions so we have to catch that
   set +e
@@ -1132,7 +1131,6 @@ command_version() {
     _debug " mktemp: $(mktemp --version 2>&1 | head -n1)"
     _debug " grep: $(grep --version 2>&1 | head -n1)"
     _debug " diff: $(diff --version 2>&1 | head -n1)"
-    _debug " find: $(find --version 2>&1 | head -n1)"
   fi
   _debug " openssl: $("${OPENSSL}" version 2>&1)"
 
@@ -1221,12 +1219,8 @@ command_sign_domains() {
       _exiterr "domains.txt found but not readable"
     fi
   else
-#    DOMAINS_TXT="$(_mktemp)"
-#    PARAM_DOMAIN="find"
     _debug "domains.txt not found and --domain not given"  ## , using ${CERTDIR}"
     exit 1;
-#    find ${CERTDIR}/ -maxdepth 1 -mindepth 1 -type d -printf "%f\n" > "${DOMAINS_TXT}"
-#	exit 0;
   fi
 
   # Generate certificates for all domains found in domains.txt. Check if existing certificate are about to expire
@@ -1508,7 +1502,7 @@ command_revoke() {
 }
 
 # Usage: --cleanup (-gc)
-# Description: Move unused certificate files to archive directory
+# Description: Move unused certificate files and used requests to archive directory
 command_cleanup() {
   if [ ! "${1:-}" = "noinit" ]; then
     load_config
