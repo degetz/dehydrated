@@ -45,6 +45,7 @@ check_dependencies() {
   command -v grep > /dev/null 2>&1 || _exiterr "This script requires grep."
   command -v mktemp > /dev/null 2>&1 || _exiterr "This script requires mktemp."
   command -v diff > /dev/null 2>&1 || _exiterr "This script requires diff."
+  command -v find > /dev/null 2>&1 || _exiterr "This script requires find."
 
   # curl returns with an error code in some ancient versions so we have to catch that
   set +e
@@ -283,6 +284,7 @@ load_config() {
   [[ -n "${PARAM_KEY_ALGO:-}" ]] && KEY_ALGO="${PARAM_KEY_ALGO}"
   [[ -n "${PARAM_OCSP_MUST_STAPLE:-}" ]] && OCSP_MUST_STAPLE="${PARAM_OCSP_MUST_STAPLE}"
   [[ -n "${PARAM_IP_VERSION:-}" ]] && IP_VERSION="${PARAM_IP_VERSION}"
+  [[ -n "${PARAM_KEYSIZE:-}" ]] && KEYSIZE="${PARAM_KEYSIZE}"  
 
   if [ ! "${1:-}" = "noverify" ]; then
     verify_config
@@ -1130,6 +1132,7 @@ command_version() {
     _debug " mktemp: $(mktemp --version 2>&1 | head -n1)"
     _debug " grep: $(grep --version 2>&1 | head -n1)"
     _debug " diff: $(diff --version 2>&1 | head -n1)"
+    _debug " find: $(find --version 2>&1 | head -n1)"
   fi
   _debug " openssl: $("${OPENSSL}" version 2>&1)"
 
@@ -1218,7 +1221,12 @@ command_sign_domains() {
       _exiterr "domains.txt found but not readable"
     fi
   else
-    _exiterr "domains.txt not found and --domain not given"
+#    DOMAINS_TXT="$(_mktemp)"
+#    PARAM_DOMAIN="find"
+    _debug "domains.txt not found and --domain not given"  ## , using ${CERTDIR}"
+    exit 1;
+#    find ${CERTDIR}/ -maxdepth 1 -mindepth 1 -type d -printf "%f\n" > "${DOMAINS_TXT}"
+#	exit 0;
   fi
 
   # Generate certificates for all domains found in domains.txt. Check if existing certificate are about to expire
@@ -1248,7 +1256,7 @@ command_sign_domains() {
     fi
 
     local certdir="${CERTDIR}/${alias}"
-    cert="${certdir}/cert.pem"
+    cert="${certdir}/${CERTFNAME}.pem"
     chain="${certdir}/chain.pem"
 
     force_renew="${PARAM_FORCE:-no}"
@@ -1351,7 +1359,7 @@ command_sign_domains() {
         else
           # Certificate-Names unchanged and cert is still valid
           _debug "Skipping renew!"
-          [[ -n "${HOOK}" ]] && "${HOOK}" "unchanged_cert" "${domain}" "${certdir}/privkey.pem" "${certdir}/cert.pem" "${certdir}/fullchain.pem" "${certdir}/chain.pem"
+          [[ -n "${HOOK}" ]] && "${HOOK}" "unchanged_cert" "${domain}" "${certdir}/${KEYFNAME}.pem" "${certdir}/${CERTFNAME}.pem" "${certdir}/${FULLCFNAME}.pem" "${certdir}/chain.pem"
           skip="yes"
         fi
       else
@@ -1691,6 +1699,15 @@ main() {
         else
           PARAM_DOMAIN="${PARAM_DOMAIN} ${1}"
          fi
+        ;;
+
+      # PARAM_Usage: --keysize bits
+      # PARAM_Description: Use specified keysize for private keys (default: 4096) 
+      --keysize)
+        shift 1
+        check_parameters "${1:-}"
+        [[ -n "${PARAM_KEYSIZE:-}" ]] && _exiterr "Keysize can only be specified once!"
+        PARAM_KEYSIZE="${1}"
         ;;
 
       # PARAM_Usage: --alias certalias
