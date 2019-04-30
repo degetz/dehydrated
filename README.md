@@ -60,6 +60,7 @@ Commands:
 
 Parameters:
  --accept-terms                   Accept CAs terms of service
+ --quiet (-q)                     Suppresses standard output when using --quiet, useful with --signcsr
  --full-chain (-fc)               Print full chain when using --signcsr
  --ipv4 (-4)                      Resolve names to IPv4 addresses only
  --ipv6 (-6)                      Resolve names to IPv6 addresses only
